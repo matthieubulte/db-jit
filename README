@@ -1,0 +1,3 @@
+### CPP Jit
+
+This repository is a PoC of JIT compiling a simple expression language to define operations that can usually be done on on database columns. 

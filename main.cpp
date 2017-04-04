@@ -1,25 +1,27 @@
 #include "main.hpp"
 
-int main() {
-    int page_size = getpagesize();
+using namespace REGISTERS;
 
+int main() {
     int a = 2;
     int b = 1;
     int c;
 
-    code_emitter emitter(page_size);
+    code_emitter emitter;
 
-    MOV<RAX>(&emitter, (uint64_t)&a);
-    MOV_FROM_REGISTER_AS_MEMORY<EBX, RAX>(&emitter);
-    MOV<RAX>(&emitter, (uint64_t)&b);
-    MOV_FROM_REGISTER_AS_MEMORY<ECX, RAX>(&emitter);
-    MOV<RAX>(&emitter, (uint64_t)&b);
-    MOV_FROM_REGISTER_AS_MEMORY<EDX, RAX>(&emitter);
-    ADD<EBX, ECX>(&emitter);
-    ADD<EBX, EDX>(&emitter);
-    MOV<RAX>(&emitter, (uint64_t)&c);
-    MOV_TO_REGISTER_AS_MEMORY<RAX, EBX>(&emitter);
-    RET(&emitter);
+    emitter.move(STANDARD_64::R::RAX, (uint64_t)&a);
+    emitter.move_from_register_as_memory(STANDARD_32::R::EBX, STANDARD_64::R::RAX);
+    emitter.move(STANDARD_64::R::RAX, (uint64_t)&b);
+    emitter.move_from_register_as_memory(STANDARD_32::R::ECX, STANDARD_64::R::RAX);
+    emitter.move(STANDARD_64::R::RAX, (uint64_t)&b);
+    emitter.move_from_register_as_memory(STANDARD_32::R::EDX, STANDARD_64::R::RAX);
+
+    emitter.add(STANDARD_32::R::EBX, STANDARD_32::R::ECX);
+    emitter.add(STANDARD_32::R::EBX, STANDARD_32::R::EDX);
+
+    emitter.move(STANDARD_64::R::RAX, (uint64_t)&c);
+    emitter.move_to_register_as_memory(STANDARD_64::R::RAX, STANDARD_32::R::EBX);
+    emitter.ret();
 
     VOID_FUNCTION f = emitter.compile();
 

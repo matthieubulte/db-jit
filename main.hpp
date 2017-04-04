@@ -3,7 +3,6 @@
 
 #include <iostream>
 
-#include "code_emitter.hpp"
-#include "isa/instructions.hpp"
+#include "isa/code_emitter.hpp"
 
 #endif //DB_JIT_MAIN_H

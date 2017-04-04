@@ -23,26 +23,39 @@ void code_emitter::write_imm(uint64_t imm) {
   write_bytes(8, reinterpret_cast<const unsigned char*>(&imm));
 }
 
-void code_emitter::add(REGISTERS::STANDARD_32::R TO, REGISTERS::STANDARD_32::R FROM) {
+void code_emitter::add(REGISTERS::STANDARD_32 TO, REGISTERS::STANDARD_32 FROM) {
   write_byte('\x01');
   write_byte(((unsigned char)'\xc0') + (unsigned char)(FROM*8 + TO));
 }
 
-void code_emitter::move(REGISTERS::STANDARD_64::R TO, uint64_t imm) {
+void code_emitter::move(REGISTERS::STANDARD_64 TO, uint64_t imm) {
   OP_SIZE_64_STANDARD();
   write_byte(((unsigned char)'\xb8') + TO);
   write_imm(imm);
 }
 
-void code_emitter::move_from_register_as_memory(REGISTERS::STANDARD_32::R R_TO, REGISTERS::STANDARD_64::R R_FROM) {
-  write_byte('\x8b');
-  write_byte((unsigned char)(R_TO*8 + R_FROM));
-};
-
-void code_emitter::move_to_register_as_memory(REGISTERS::STANDARD_64::R R_TO, REGISTERS::STANDARD_32::R R_FROM) {
-  write_byte('\x89');
-  write_byte((unsigned char)(R_TO + R_FROM*8));
-};
+void code_emitter::move(REGISTERS::STANDARD_32 TO, REGISTERS::MEMORY_ACCESS&& FROM) {
+  switch(FROM.type) {
+    case REGISTERS::REGISTER_TYPE::standard_64: {
+      write_byte('\x8b');
+      write_byte((unsigned char)(TO*8 + FROM.reg));
+    } break;
+    default: {
+      throw new std::runtime_error("Not implemented yet.");
+    }
+  }
+}
+void code_emitter::move(REGISTERS::MEMORY_ACCESS&& TO, REGISTERS::STANDARD_32 FROM) {
+  switch(TO.type) {
+    case REGISTERS::REGISTER_TYPE::standard_64: {
+      write_byte('\x89');
+      write_byte((TO.reg + FROM*8));
+    } break;
+    default: {
+      throw new std::runtime_error("Not implemented yet.");
+    }
+  }
+}
 
 void code_emitter::ret() {
   write_byte('\xc3');

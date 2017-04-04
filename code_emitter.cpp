@@ -1,7 +1,5 @@
 #include "code_emitter.hpp"
 
-#include "isa/instructions.hpp"
-
 void code_emitter::write_byte(unsigned char b) {
   base[offset++] = (signed char)b;
 }
@@ -30,3 +28,11 @@ void code_emitter::write_imm(uint64_t imm) {
 unsigned long code_emitter::length() { return offset; }
 
 char* code_emitter::get() { return base.get(); }
+
+VOID_FUNCTION code_emitter::compile() {
+  void *mem = mmap(NULL, length(), PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
+  functions.push_back(std::make_pair(mem, offset));
+  memcpy(mem, get(), length());
+  mprotect(mem, length(), PROT_READ | PROT_EXEC);
+  return (VOID_FUNCTION)mem;
+}

@@ -15,30 +15,15 @@ int main() {
     MOV_FROM_REGISTER_AS_MEMORY<ECX, RAX>(&emitter);
     MOV<RAX>(&emitter, (uint64_t)&b);
     MOV_FROM_REGISTER_AS_MEMORY<EDX, RAX>(&emitter);
-
     ADD<EBX, ECX>(&emitter);
     ADD<EBX, EDX>(&emitter);
-
     MOV<RAX>(&emitter, (uint64_t)&c);
-
     MOV_TO_REGISTER_AS_MEMORY<RAX, EBX>(&emitter);
-
     RET(&emitter);
 
-    // Run it
-    void *mem = mmap(NULL, page_size,
-                     PROT_READ | PROT_WRITE,
-                     MAP_ANON | MAP_PRIVATE,
-                     -1, 0);
+    VOID_FUNCTION f = emitter.compile();
 
-
-    memcpy(mem, emitter.get(), emitter.length());
-    mprotect(mem, page_size, PROT_READ | PROT_EXEC);
-
-    ((void (*) ())mem)();
-
-    munmap(mem, page_size);
-    // End run it
+    f();
 
     std::cout << c << std::endl;
 

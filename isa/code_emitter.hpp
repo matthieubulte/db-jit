@@ -14,7 +14,7 @@ typedef void (*VOID_FUNCTION)(void);
 namespace REGISTERS {
   class STANDARD_64 {
   public:
-    static enum R {
+    enum R {
       RAX = 0,
       RCX = 1,
       RDX = 2,
@@ -28,7 +28,7 @@ namespace REGISTERS {
 
   class ADDITIONAL_64 {
   public:
-    static enum R {
+    enum R {
       R8 = 0,
       R9 = 1,
       R10 = 2,
@@ -42,7 +42,7 @@ namespace REGISTERS {
 
   class STANDARD_32 {
   public:
-    static enum R {
+    enum R {
       EAX = 0,
       ECX = 1,
       EDX = 2,

@@ -69,7 +69,7 @@ void MOV_TO_REGISTER_AS_MEMORY(code_emitter *e) {
 template<REGISTERS_32_STANDARD R1, REGISTERS_32_STANDARD R2>
 void ADD(code_emitter *e) {
   e->write_byte('\x01');
-  e->write_byte((unsigned char)(R2*8 + R1));
+  e->write_byte(((unsigned char)'\xc0') + (unsigned char)(R2*8 + R1));
 };
 
 void RET(code_emitter *e);

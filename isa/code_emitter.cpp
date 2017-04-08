@@ -28,6 +28,30 @@ void code_emitter::add(REGISTERS::STANDARD_32 TO, REGISTERS::STANDARD_32 FROM) {
   write_byte(((unsigned char)'\xc0') + (unsigned char)(FROM*8 + TO));
 }
 
+void code_emitter::add(REGISTERS::MEMORY_ACCESS&& TO, REGISTERS::STANDARD_32 FROM) {
+switch(TO.type) {
+    case REGISTERS::REGISTER_TYPE::standard_32: {
+      write_byte('\x01');
+      write_byte((unsigned char)(FROM*8 + TO.reg));
+    } break;
+    default: {
+      throw new std::runtime_error("Not implemented yet.");
+    }
+  }
+}
+
+void code_emitter::add(REGISTERS::STANDARD_32 TO, REGISTERS::MEMORY_ACCESS&& FROM) {
+switch(FROM.type) {
+    case REGISTERS::REGISTER_TYPE::standard_32: {
+      write_byte('\x03');
+      write_byte((unsigned char)(FROM.reg + TO*8));
+    } break;
+    default: {
+      throw new std::runtime_error("Not implemented yet.");
+    }
+  }
+}
+
 void code_emitter::move(REGISTERS::STANDARD_64 TO, uint64_t imm) {
   OP_SIZE_64_STANDARD();
   write_byte(((unsigned char)'\xb8') + TO);

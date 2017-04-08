@@ -3,27 +3,59 @@
 
 using namespace REGISTERS;
 
+#define STR1(x) #x
+#define STR(x) STR1(x)
+#define N 10
+
 int main() {
-    int a = 2;
-    int b = 1;
-    int c;
 
-    stack_machine m;
+    int as[N];
+    int cs[N];
+    
+    code_emitter ce;
 
-    m.push(&a);
-    m.push(&b);
-    m.push(&b);
+    ce.move(STANDARD_32::EDI,
+	    MEMORY_ACCESS(STANDARD_64::RBX));
 
-    m.add();
-    m.add();
+    ce.move(MEMORY_ACCESS(STANDARD_64::RDX),
+	    STANDARD_32::EDI);
 
-    m.store(&c);
+    ce.ret();
+    
+    VOID_FUNCTION f = ce.compile();
+    
+    for (int i = 0; i < N; i++) {
+      as[i] = i;
+    }
 
-    VOID_FUNCTION f = m.compile();
+    asm volatile (
+	".intel_syntax\n"
+	"mov %%rbx,%0\n"
+	"mov %%rdx,%1\n"
 
-    f();
+	"xor %%eax, %%eax\n"
+	
+	"start:\n"
 
-    std::cout << c << std::endl;
+	"call %2\n"
+	
+	"add %%rbx,4\n"
+	"add %%rdx,4\n"
 
+	"inc %%eax\n"
+	"cmp %%eax," STR(N) "\n"
+	"jne start\n"
+	".att_syntax\n"
+	:
+	: "r"(&as[0]), "r"(&cs[0]), "r"(f)
+    );
+    // note: asm passes the arguments using registers, be carefull
+    // note': anyway this code will get generated in the future
+    
+    for (int i = 0; i < N; i++) {
+      assert(as[i] == cs[i]);
+    }
+
+    
     return 0;
 }
